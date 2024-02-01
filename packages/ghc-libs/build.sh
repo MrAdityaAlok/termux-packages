@@ -64,3 +64,8 @@ termux_step_make_install() {
 	sed -i 's/"LLVM opt command", "opt.*"/"LLVM opt command", "opt"/' \
 		"$TERMUX_PREFIX/lib/$target-ghc-$TERMUX_PKG_VERSION/lib/settings" || :
 }
+
+termux_step_install_license() {
+	install -Dm600 -t "$TERMUX_PREFIX/share/doc/$TERMUX_PKG_NAME" \
+		"$TERMUX_PKG_SRCDIR/LICENSE"
+}
