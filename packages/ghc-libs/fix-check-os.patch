@@ -1,0 +1,12 @@
+# Pass for android too, since for bindist configure script `$BuildOs` is just android, which fails the test.
+--- ghc/m4/fptools_set_haskell_platform_vars.m4	2023-10-07 08:28:11.000000000 +0530
++++ ghc.mod/m4/fptools_set_haskell_platform_vars.m4	2024-01-31 20:57:20.101091657 +0530
+@@ -73,7 +73,7 @@
+ 
+     checkOS() {
+         case [$]1 in
+-        linux|linux-android)
++        linux|linux-android|android)
+             test -z "[$]2" || eval "[$]2=OSLinux"
+             ;;
+         darwin|ios|watchos|tvos)

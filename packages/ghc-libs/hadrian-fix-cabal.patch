@@ -1,0 +1,45 @@
+--- ghc/hadrian/cabal.project	2023-10-07 08:28:11.000000000 +0530
++++ ghc.mod/hadrian/cabal.project	2024-01-27 16:59:41.894706598 +0530
+@@ -1,4 +1,7 @@
+-packages: ./
++packages: 
++    ./
++    ../Cabal-syntax-patched/
++    ../Cabal-patched/
+ 
+ -- This essentially freezes the build plan for hadrian
+ index-state: 2023-03-30T10:00:00Z
+
+# Hardian always refers to Android as "linux_android" but Cabal-syntax ambiguously refers to
+# it simply as "android".
+# This causes inconsistencey in where libraries are installed:
+# Cabal installs in "$arch-android-ghc$ghc_version" instead of "$arch-linux_android-ghc$ghc_version".
+
+# Patch Cabal-syntax used by hadrian:
+--- a/Cabal-syntax-patched/src/Distribution/System.hs	2023-05-23 08:17:29.000000000 +0530
++++ b/Cabal-syntax-patched/src/Distribution/System.hs	2023-07-27 04:14:08.822137792 +0530
+@@ -135,7 +135,9 @@
+ 
+ instance Pretty OS where
+   pretty (OtherOS name) = Disp.text name
+-  pretty other          = Disp.text (lowercase (show other))
++  pretty other          = case other of
++        Android -> Disp.text ("linux_" ++ (lowercase (show other)))
++        _       -> Disp.text (lowercase (show other))
+ 
+ instance Parsec OS where
+   parsec = classifyOS Compat <$> parsecIdent
+
+# Do not pass `--host` flag since it is wrong.
+--- a/Cabal-patched/src/Distribution/Simple.hs	2001-09-09 07:16:40.000000000 +0530
++++ b/Cabal-patched/src/Distribution/Simple.hs	2024-01-26 16:44:09.766490409 +0530
+@@ -694,8 +694,7 @@
+       overEnv = ("CFLAGS", Just cflagsEnv) :
+                 [("PATH", Just pathEnv) | not (null extraPath)]
+       hp = hostPlatform lbi
+-      maybeHostFlag = if hp == buildPlatform then [] else ["--host=" ++ show (pretty hp)]
+-      args' = configureFile':args ++ ["CC=" ++ ccProgShort] ++ maybeHostFlag
++      args' = configureFile':args ++ ["CC=" ++ ccProgShort]
+       shProg = simpleProgram "sh"
+       progDb = modifyProgramSearchPath
+                (\p -> map ProgramSearchPathDir extraPath ++ p) emptyProgramDb
