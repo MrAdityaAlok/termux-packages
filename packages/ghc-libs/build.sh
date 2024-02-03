@@ -46,7 +46,7 @@ termux_step_pre_configure() {
 termux_step_make() {
 	unset CFLAGS CPPFLAGS LDFLAGS # For stage0 compilation.
 
-	./hadrian/build binary-dist-dir --flavour=perf+no_profiled_libs --docs=none \
+	./hadrian/build binary-dist-dir --flavour=perf+llvm --docs=none \
 		"stage1.rts.ghc.c.opts += -optc-Wno-error" \
 		"stage1.*.ghc.*.opts += -optl-landroid-posix-semaphore" \
 		"stage2.*.ghc.*.opts += -optl-landroid-posix-semaphore"
