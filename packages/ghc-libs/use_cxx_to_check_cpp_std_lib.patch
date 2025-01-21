@@ -1,0 +1,13 @@
+# Use CXX for compiling c++ programs in proot.
+
+--- ghc-9.12.1/m4/fp_find_cxx_std_lib.m4	2024-12-16 00:59:46.000000000 +0530
++++ ghc-9.12.1.mod/m4/fp_find_cxx_std_lib.m4	2025-01-20 17:19:08.701874735 +0530
+@@ -64,7 +64,7 @@
+             dnl Ensures that CC uses same library path of CXX.
+             p="`"$CXX" --print-file-name ${2}`"
+             d="`dirname "$p"`"
+-            if "$CC" -o actest actest.o ${1} -L"$d" 2>/dev/null; then
++            if "$CXX" -o actest actest.o ${1} -L"$d" 2>/dev/null; then
+                 CXX_STD_LIB_LIBS="${3}"
+                 dnl On some platforms (e.g. Windows) the C++ standard library
+                 dnl can be found in the system search path. In this case $CXX

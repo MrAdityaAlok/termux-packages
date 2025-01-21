@@ -2,10 +2,11 @@ TERMUX_PKG_HOMEPAGE=https://www.haskell.org/ghc/
 TERMUX_PKG_DESCRIPTION="The Glasgow Haskell Compiler libraries"
 TERMUX_PKG_LICENSE="custom"
 TERMUX_PKG_MAINTAINER="Aditya Alok <alok@termux.dev>"
-TERMUX_PKG_VERSION=9.8.1
+TERMUX_PKG_VERSION=9.12.1
 TERMUX_PKG_SRCURL="https://downloads.haskell.org/~ghc/$TERMUX_PKG_VERSION/ghc-$TERMUX_PKG_VERSION-src.tar.xz"
-TERMUX_PKG_SHA256=b2f8ed6b7f733797a92436f4ff6e088a520913149c9a9be90465b40ad1f20751
-TERMUX_PKG_DEPENDS="libiconv, libffi, libgmp, libandroid-posix-semaphore, bionic-host"
+TERMUX_PKG_SHA256=4a7410bdeec70f75717087b8f94bf5a6598fd61b3a0e1f8501d8f10be1492754
+TERMUX_PKG_DEPENDS="libiconv, libffi, libgmp, libandroid-posix-semaphore"
+TERMUX_PKG_BUILD_DEPENDS="dnsutils"
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --host=$TERMUX_BUILD_TUPLE
@@ -14,25 +15,14 @@ TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_REPLACES="ghc-libs-static"
 
 termux_step_post_get_source() {
-	local version=3.8.1.0 #Note: As of 27-01-2024 both lib had same versioning. Review before updating.
-
 	termux_setup_ghc && termux_setup_cabal
-
-	local index_state
-	index_state="$(grep -oP '^index-state: \K(.*)' ./hadrian/cabal.project)"
-	[ -z "$index_state" ] && termux_error_exit "Unable to find index_state from ./hadrian/cabal.project"
-
 	cabal update
-	for pkg in Cabal Cabal-syntax; do
-		cabal get "$pkg"-"$version" --index-state="$index_state"
-		mkdir ./"$pkg"-patched
-		mv "$pkg"-"$version"/* ./"$pkg"-patched
-	done
 }
 
 termux_step_pre_configure() {
 	export CONF_CC_OPTS_STAGE1="$CFLAGS $CPPFLAGS" CONF_GCC_LINKER_OPTS_STAGE1="$LDFLAGS"
 	export CONF_CC_OPTS_STAGE2="$CFLAGS $CPPFLAGS" CONF_GCC_LINKER_OPTS_STAGE2="$LDFLAGS"
+	# export CONF_GCC_SUPPORTS_NO_PIE=NO # Linker says it does, but Android > 5.0 cannot run them.
 
 	export target="$TERMUX_HOST_PLATFORM"
 	if [ "$TERMUX_ARCH" = "arm" ]; then
@@ -44,24 +34,42 @@ termux_step_pre_configure() {
 }
 
 termux_step_make() {
-	unset CFLAGS CPPFLAGS LDFLAGS # For stage0 compilation.
+	termux_setup_ghc && termux_setup_cabal
+	(
+		# XXX: Temporary
 
-	./hadrian/build binary-dist-dir --flavour=quickest+llvm+no_profiled_libs --docs=none \
-		"stage1.rts.ghc.c.opts += -optc-Wno-error" \
-		"stage1.*.ghc.*.opts += -optl-landroid-posix-semaphore"
+		unset CFLAGS CPPFLAGS LDFLAGS # For stage0 compilation.
+
+		./hadrian/build binary-dist-dir -j --flavour=quickest+no_profiled_libs --docs=none \
+			"stage1.*.ghc.*.opts += -optl-landroid-posix-semaphore" \
+			"stage2.*.ghc.*.opts += -optl-landroid-posix-semaphore"
+	)
 }
 
 termux_step_make_install() {
-	cd ./_build/bindist/ghc-*
+	# XXX: Temporary
+	export target="$TERMUX_HOST_PLATFORM"
+	if [ "$TERMUX_ARCH" = "arm" ]; then
+		target="armv7a-linux-androideabi"
+	fi
+	# patch -p1 <"$TERMUX_PKG_BUILDER_DIR"/use-stage1-ghc-on-host.patch
 
-	./configure --prefix="$TERMUX_PREFIX" --host="$target"
-	make install
+	(
+		cd _build/bindist/ghc-"$TERMUX_PKG_VERSION"-"$target" || exit 1
+		CXX_STD_LIB_LIBS="c++ c++abi" ./configure --prefix="$TERMUX_PREFIX" --host="$target"
+		HOST_GHC_PKG="$(realpath ../../stage1/bin/"$target"-ghc-pkg)" make install
+	)
 
 	# We may build GHC with `llc-9` etc., but only `llc` is present in Termux
 	sed -i 's/"LLVM llc command", "llc.*"/"LLVM llc command", "llc"/' \
 		"$TERMUX_PREFIX/lib/$target-ghc-$TERMUX_PKG_VERSION/lib/settings" || :
 	sed -i 's/"LLVM opt command", "opt.*"/"LLVM opt command", "opt"/' \
 		"$TERMUX_PREFIX/lib/$target-ghc-$TERMUX_PKG_VERSION/lib/settings" || :
+
+	# `configure` script was ment to be run on device but since we are running on CI we need to remove cross compiler flag.
+	sed -i 's|"cross compiling", "YES"|"cross compiling", "NO"|' \
+		"$TERMUX_PREFIX/lib/$target-ghc-$TERMUX_PKG_VERSION/lib/settings" || :
+
 }
 
 termux_step_install_license() {

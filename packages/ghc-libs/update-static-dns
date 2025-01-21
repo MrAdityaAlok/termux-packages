@@ -1,0 +1,33 @@
+#!/host-rootfs/bin/bash
+
+echo "127.0.0.1 localhost $(hostname)" >/system/etc/hosts
+echo "::1 ip6-localhost" >>/system/etc/hosts
+
+# IPv4
+for host in $(cat /system/etc/static-dns-hosts.txt | grep -vE '^\s*#'); do
+	ip_addr=$(nslookup -type=a "$host" 8.8.8.8 | awk '/^Address: / { print $2 ; exit }')
+
+	if [ -z "$ip_addr" ]; then
+		echo "Can't resolve '$host'." >&2
+		continue
+	fi
+
+	echo "$ip_addr $host" | tee -a /system/etc/hosts
+done
+
+# Check whether IPv6 is available.
+curl http://[2606:4700:4700::1111] -o /dev/null -s
+if [[ $? != 0 ]]; then
+	exit
+fi
+# IPv6
+for host in $(cat /system/etc/static-dns-hosts.txt | grep -vE '^\s*#'); do
+	ip_addr=$(nslookup -type=aaaa "$host" 2001:4860:4860::8888 | awk '/^Address: / { print $2 ; exit }')
+
+	if [ -z "$ip_addr" ]; then
+		echo "Can't resolve '$host'." >&2
+		continue
+	fi
+
+	echo "$ip_addr $host" | tee -a /system/etc/hosts
+done
