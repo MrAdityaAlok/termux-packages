@@ -210,11 +210,19 @@ jobs:
         if [ "$DOCKER_BUILD" == 'false' ]; then
           ./scripts/setup-ubuntu.sh
           sudo apt install ninja-build
-          sudo apt purge -yq $(dpkg -l | grep '^ii' | awk '{ print $2 }' | grep -P '(aspnetcore|cabal-|dotnet-|ghc-|libmono|mongodb-|mysql-|php)') \
-            firefox google-chrome-stable microsoft-edge-stable mono-devel mono-runtime-common monodoc-manual ruby
+          sudo apt purge -yq $(dpkg -l | grep '^ii' | awk '{ print $2 }' | grep -P '(aspnetcore|cabal-|dotnet-|ghc-|libmono|mongodb-|mysql-|llvm-|liblldb-|php)') \
+            firefox google-chrome-stable microsoft-edge-stable mono-devel mono-runtime-common monodoc-manual ruby \
+            azure-cli powershell libgl1-mesa-dri shellcheck mercurial-common humanity-icon-theme google-cloud-cli
           sudo apt autoremove -yq
           sudo apt clean
-          sudo rm -fr /opt/ghc /opt/hostedtoolcache /usr/lib/node_modules /usr/local/share/boost /usr/share/dotnet /usr/share/swift
+          sudo rm -fr /opt/ghc /opt/hostedtoolcache /usr/lib/node_modules /usr/share/dotnet /usr/share/swift
+          sudo rm -rf /usr/local/graalvm/ /usr/local/.ghcup/ /usr/local/share/powershell /usr/local/share/chromium /usr/local/lib/android
+          # https://github.com/actions/runner-images/issues/709#issuecomment-612569242
+          sudo rm -rf /usr/local/share/boost
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+          # Prune unused, cached docker images:
+          sudo docker image prune --all --force
+          sudo docker builder prune -a
         fi
 
     - name: Build packages
