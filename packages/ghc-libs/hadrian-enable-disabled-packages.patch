@@ -1,5 +1,5 @@
---- ghc-9.12.1/hadrian/src/Settings/Default.hs	2025-02-24 22:46:43.668323779 +0530
-+++ ghc-9.12.1.mod/hadrian/src/Settings/Default.hs	2025-02-26 16:23:47.747069033 +0530
+--- ./hadrian/src/Settings/Default.hs.orig	2025-03-15 17:15:44.476307641 +0530
++++ ./hadrian/src/Settings/Default.hs	2025-03-15 17:17:17.661527583 +0530
 @@ -116,7 +116,7 @@
               -- that confused Hadrian, so we must make those a stage0 package as well.
               -- Once we drop `Win32`/`unix` it should be possible to drop those too.
@@ -15,17 +15,17 @@
          , xhtml
 +        , runGhc
 +        , hpcBin
++        , iserv
          , if winTarget then win32 else unix
          ]
        , when (not cross)
          [ haddock
 -        , hpcBin
-         , iserv
+-        , iserv
 -        , runGhc
          , ghcToolchainBin
          ]
        , when (winTarget && not cross)
-
 
 # Extra patches for terminfo:
 --- ghc-9.12.1/hadrian/src/Settings/Packages.hs	2025-02-24 22:46:43.668323779 +0530
