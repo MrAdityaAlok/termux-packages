@@ -79,16 +79,16 @@ termux_setup_ghc_iserv() {
 	local target="$TERMUX_HOST_PLATFORM"
 	[[ "$TERMUX_ARCH" == "arm" ]] && target="armv7a-linux-androideabi"
 
-	termux_download "https://github.com/termux/ghc-cross-tools/releases/download/ghc-v$TERMUX_ISERV_VERSION/iserv-$TERMUX_ISERV_VERSION-$target.tar.xz" \
-		"$TERMUX_ISERV_TAR" \
-		"${checksums[$TERMUX_ARCH]}"
-
-	tar xf "$TERMUX_ISERV_TAR" -C "$TERMUX_ISERV_BIN"
-	chmod +x "$TERMUX_ISERV_BIN"/"$target"-ghc-iserv
+	# termux_download "https://github.com/termux/ghc-cross-tools/releases/download/ghc-v$TERMUX_ISERV_VERSION/iserv-$TERMUX_ISERV_VERSION-$target.tar.xz" \
+	# 	"$TERMUX_ISERV_TAR" \
+	# 	"${checksums[$TERMUX_ARCH]}"
+	#
+	# tar xf "$TERMUX_ISERV_TAR" -C "$TERMUX_ISERV_BIN"
+	# chmod +x "$TERMUX_ISERV_BIN"/"$target"-ghc-iserv
 
 	cat <<-EOF >"$TERMUX_ISERV_BIN/$TERMUX_ISERV_BIN_NAME"
 		#!/bin/bash
-		termux-proot-run-$TERMUX_ARCH $TERMUX_ISERV_BIN/$target-ghc-iserv "\$@"
+		termux-proot-run-$TERMUX_ARCH $TERMUX_SCRIPTDIR/ghc-iserv-dyn "\$@"
 	EOF
 
 	chmod +x "$TERMUX_ISERV_BIN/$TERMUX_ISERV_BIN_NAME"
