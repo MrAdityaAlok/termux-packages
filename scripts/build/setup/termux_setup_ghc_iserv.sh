@@ -88,7 +88,7 @@ termux_setup_ghc_iserv() {
 
 	cat <<-EOF >"$TERMUX_ISERV_BIN/$TERMUX_ISERV_BIN_NAME"
 		#!/bin/bash
-		termux-proot-run-$TERMUX_ARCH $TERMUX_SCRIPTDIR/ghc-iserv-dyn "\$@"
+		termux-proot-run-$TERMUX_ARCH $(find "$TERMUX_PREFIX"/lib/ghc-*/bin -type f -name ghc-iserv-dyn -print) "\$@"
 	EOF
 
 	chmod +x "$TERMUX_ISERV_BIN/$TERMUX_ISERV_BIN_NAME"
