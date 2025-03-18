@@ -9,7 +9,7 @@ TERMUX_PKG_AUTO_UPDATE=false
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_SUGGESTS="ghc"
 TERMUX_PKG_DEPENDS="libffi, libiconv, libgmp, zlib, libandroid-posix-semaphore"
-TERMUX_PKG_BUILD_DEPENDS="aosp-libs"
+TERMUX_PKG_BUILD_DEPENDS="aosp-libs, ghc-libs"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-f-native-dns --ghc-options=-optl-landroid-posix-semaphore"
 TERMUX_PKG_USES_HASKELL_TEMPLATE=true
 # Its dependency `aromic-counter-0.1.2.3` has some problem with llvm optimiser:
