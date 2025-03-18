@@ -11,10 +11,10 @@ TERMUX_PKG_EXTRA_CONFIGURE_ARGS="
 --host=$TERMUX_BUILD_TUPLE
 --with-system-libffi
 --disable-ld-override"
-TERMUX_PKG_REPLACES="ghc-libs-static, ghc-libs"
-TERMUX_PKG_PROVIDES="ghc-libs, ghc-libs-static"
 TERMUX_PKG_NO_STATICSPLIT=true
 TERMUX_PKG_LICENSE_FILE="LICENSE"
+TERMUX_PKG_REPLACES="ghc-libs-static"
+TERMUX_PKG_PROVIDES="ghc-libs-static"
 
 termux_step_pre_configure() {
 	termux_setup_ghc && termux_setup_cabal
@@ -40,7 +40,7 @@ termux_step_make() {
 		# NOTE: We do not build profiled libs. It exceeds the 6 hours usage limit of github CI.
 		./hadrian/build binary-dist-dir \
 			-j"$TERMUX_PKG_MAKE_PROCESSES" \
-			--flavour="perf+split_sections+no_profiled_libs" \
+			--flavour="perf+no_profiled_libs" \
 			--docs=none \
 			"stage1.unix.ghc.link.opts += -optl-landroid-posix-semaphore" \
 			"stage2.unix.ghc.link.opts += -optl-landroid-posix-semaphore"

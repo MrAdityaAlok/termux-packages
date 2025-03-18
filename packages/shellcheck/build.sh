@@ -8,6 +8,7 @@ TERMUX_PKG_SRCURL="https://hackage.haskell.org/package/ShellCheck-${TERMUX_PKG_V
 TERMUX_PKG_SHA256=4d08db432d75a34486a55f6fff9d3e3340ce56125c7804b7f8fd14421b936d21
 TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="libffi, libgmp, libiconv"
+TERMUX_PKG_BUILD_DEPENDS="ghc-libs"
 
 termux_step_pre_configure() {
 	chmod u+x ./striptests

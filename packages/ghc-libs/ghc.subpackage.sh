@@ -1,8 +1,11 @@
 # shellcheck shell=bash
 TERMUX_SUBPKG_DESCRIPTION="The Glasgow Haskell Compiler"
-TERMUX_SUBPKG_DEPENDS="binutils-is-llvm | binutils, llvm, clang"
+TERMUX_SUBPKG_DEPENDS="clang"
 
-TERMUX_SUBPKG_INCLUDE="lib/ghc-$TERMUX_PKG_VERSION/ghc-$TERMUX_PKG_VERSION"
+TERMUX_SUBPKG_INCLUDE="
+lib/*-linux-ghc-$TERMUX_PKG_VERSION-inplace/ghc-$TERMUX_PKG_VERSION
+lib/*-linux-ghc-$TERMUX_PKG_VERSION-inplace/libHSghc-$TERMUX_PKG_VERSION-inplace-ghc$TERMUX_PKG_VERSION.so
+"
 
 while read -r file; do
 	TERMUX_SUBPKG_INCLUDE+=" ${file/$TERMUX_PREFIX\//}"
