@@ -1,5 +1,6 @@
 # shellcheck shell=bash
 # This provides an utility function to setup iserv (external interpreter of ghc) to cross compile haskell-template.
+set -x
 
 __termux_setup_proot() {
 	local TERMUX_PROOT_VERSION=5.3.0
@@ -86,9 +87,12 @@ termux_setup_ghc_iserv() {
 	# tar xf "$TERMUX_ISERV_TAR" -C "$TERMUX_ISERV_BIN"
 	# chmod +x "$TERMUX_ISERV_BIN"/"$target"-ghc-iserv
 
+	echo "[DEBUG] ===> Finding ghc-iserv-dyn ..."
+	find "$TERMUX_PREFIX"/lib/ghc-*/bin -type f -name 'ghc-iserv-dyn-*' -print
+
 	cat <<-EOF >"$TERMUX_ISERV_BIN/$TERMUX_ISERV_BIN_NAME"
 		#!/bin/bash
-		termux-proot-run-$TERMUX_ARCH $(find "$TERMUX_PREFIX"/lib/ghc-*/bin -type f -name ghc-iserv-dyn -print) "\$@"
+		termux-proot-run-$TERMUX_ARCH $(find "$TERMUX_PREFIX"/lib/ghc-*/bin -type f -name 'ghc-iserv-dyn-*' -print) "\$@"
 	EOF
 
 	chmod +x "$TERMUX_ISERV_BIN/$TERMUX_ISERV_BIN_NAME"

@@ -19,6 +19,6 @@ TERMUX_PKG_USES_HASKELL_TEMPLATE=true
 # `opt-18' failed in phase `LLVM Optimiser'. (Exit code: 1)
 # ```
 # Disabling for now.
-TERMUX_PKG_BLACKLISTED_ARCHES="arm"
+# TERMUX_PKG_BLACKLISTED_ARCHES="arm"
 
 # TODO: Fix arm build.
