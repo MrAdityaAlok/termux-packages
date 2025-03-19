@@ -220,9 +220,6 @@ jobs:
           # https://github.com/actions/runner-images/issues/709#issuecomment-612569242
           sudo rm -rf /usr/local/share/boost
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
-          # Prune unused, cached docker images:
-          sudo docker image prune --all --force
-          sudo docker builder prune -a
         fi
 
     - name: Build packages
