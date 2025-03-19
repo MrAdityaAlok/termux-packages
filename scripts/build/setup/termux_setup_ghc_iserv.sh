@@ -1,6 +1,5 @@
 # shellcheck shell=bash
 # This provides an utility function to setup iserv (external interpreter of ghc) to cross compile haskell-template.
-set -x
 
 __termux_setup_proot() {
 	local TERMUX_PROOT_VERSION=5.3.0
