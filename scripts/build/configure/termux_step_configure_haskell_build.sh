@@ -116,6 +116,6 @@ termux_step_configure_haskell_build() {
 			package *
 			  ghc-options: -fexternal-interpreter -pgmi=$(command -v ghc-iserv-"$TERMUX_ARCH")
 		EOF
+		cat "$(command -v ghc-iserv-"$TERMUX_ARCH")"
 	fi
-	cat "$(command -v ghc-iserv-"$TERMUX_ARCH")"
 }
