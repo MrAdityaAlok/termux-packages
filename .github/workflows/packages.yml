@@ -216,8 +216,8 @@ jobs:
         DOCKER_BUILD: ${{ steps.build-info.outputs.docker-build }}
       run: |
         if [ "$DOCKER_BUILD" == 'false' ]; then
-          ./scripts/setup-ubuntu.sh
-          sudo apt install ninja-build
+          # ./scripts/setup-ubuntu.sh
+          # sudo apt install ninja-build
           time ./scripts/free-space.sh
         fi
 
