@@ -58,7 +58,7 @@ else
 	sudo rm -rf "$AGENT_TOOLSDIRECTORY"
 
 	# We shouldn't remove docker & it's images when running from `package_updates` workflow.
-	if [ "${CLEAN_DOCKER_IMAGES-true}" = "true" ]; then
+	if [ "${CLEAN_DOCKER_IMAGES-false}" = "true" ]; then
 		echo "==> Cleaning"
 		sudo docker image prune --all --force
 		sudo docker builder prune -a
