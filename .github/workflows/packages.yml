@@ -218,7 +218,7 @@ jobs:
         if [ "$DOCKER_BUILD" == 'false' ]; then
           ./scripts/setup-ubuntu.sh
           sudo apt install ninja-build
-          time ./scripts/free-space.sh
+          time CLEAN_DOCKER_IMAGES=false ./scripts/free-space.sh
         fi
 
     - name: Build packages
