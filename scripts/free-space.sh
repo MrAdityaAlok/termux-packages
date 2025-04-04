@@ -7,16 +7,15 @@
 # dpkg-query -Wf '${Installed-Size}\t${Package}\n' | sort -n | tail -n 100
 # exit 0
 
-create_swapfile() {
-	sudo fallocate -l 4G /swapfile
-	sudo chmod 600 /swapfile
-	sudo mkswap /swapfile
-	sudo swapon /swapfile
-}
-
 if [ "${CI-false}" != "true" ]; then
 	echo "ERROR: not running on CI, not deleting system files to free space!"
 	exit 1
 else
-	create_swapfile
+	# We shouldn't remove docker & it's images when running from `package_updates` workflow.
+	if [ "${CLEAN_DOCKER_IMAGES-true}" = "true" ]; then
+		echo "==> Cleaning"
+		sudo docker image prune --all --force
+		sudo docker builder prune -a
+		sudo apt purge -yq containerd.io
+	fi
 fi
