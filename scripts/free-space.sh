@@ -68,5 +68,5 @@ else
 	sudo apt autoremove -yq
 	sudo apt clean
 
-	create_swapfile
+	time create_swapfile
 fi
