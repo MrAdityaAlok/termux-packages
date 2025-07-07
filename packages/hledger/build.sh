@@ -9,7 +9,11 @@ TERMUX_PKG_BUILD_IN_SRC=true
 TERMUX_PKG_DEPENDS="libffi, libiconv, libgmp, zlib, ncurses"
 TERMUX_PKG_BUILD_DEPENDS="aosp-libs"
 TERMUX_PKG_EXTRA_CONFIGURE_ARGS="-c entropy+donotgetentropy"
-#
+
+termux_step_pre_configure() {
+	mv /data/data/com.termux/files/usr/lib/libpthread.{so,bak} || true
+}
+
 termux_step_post_configure() {
 	cabal get splitmix-0.1.3.1 && mv splitmix{-0.1.3.1,}
 	cabal get entropy-0.4.1.11 && mv entropy{-0.4.1.11,}
