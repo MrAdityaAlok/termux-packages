@@ -12,8 +12,7 @@ termux_setup_proot() {
 	[[ -d "$TERMUX_PROOT_BIN" ]] && return
 
 	if ! [[ -d "$TERMUX_PREFIX/opt/aosp" ]]; then
-		echo "ERROR: Add 'aosp-libs' to TERMUX_PKG_BUILD_DEPENDS. 'proot' cannot run without it."
-		exit 1
+		termux_error_exit "ERROR: Add 'aosp-libs' to TERMUX_PKG_BUILD_DEPENDS. 'proot' cannot run without it."
 	fi
 
 	mkdir -p "$TERMUX_PROOT_BIN"
@@ -32,12 +31,14 @@ termux_setup_proot() {
 			"$TERMUX_PROOT_BIN"/qemu-"$TERMUX_ARCH" \
 			"${checksums[$TERMUX_ARCH]}"
 		chmod +x "$TERMUX_PROOT_BIN"/qemu-"$TERMUX_ARCH"
-		TERMUX_PROOT_QEMU="-q $TERMUX_PROOT_BIN/qemu-$TERMUX_ARCH"
+		TERMUX_PROOT_QEMU="$TERMUX_PROOT_BIN/qemu-$TERMUX_ARCH"
 	fi
 
 	# NOTE: We include current PATH too so that host binaries also become available under proot.
 	cat <<-EOF >"$TERMUX_PROOT_BIN/$TERMUX_PROOT_BIN_NAME"
 		#!/bin/bash
+		cmd="\$(command -v "\$1")" && shift
+		echo "[DEBUG]: Executing \$cmd with args \$@"
 		env -i \
 			PATH="$TERMUX_PREFIX/bin:$PATH" \
 			ANDROID_DATA=/data \
@@ -48,7 +49,7 @@ termux_setup_proot() {
 			TERM=$TERM \
 			TZ=UTC \
 			$TERMUX_PROOT_EXTRA_ENV_VARS \
-			$TERMUX_PROOT_BIN/proot $TERMUX_PROOT_QEMU -R / "\$@"
+			$TERMUX_PROOT_QEMU \$cmd "\$@"
 	EOF
 	chmod +x "$TERMUX_PROOT_BIN/$TERMUX_PROOT_BIN_NAME"
 }
