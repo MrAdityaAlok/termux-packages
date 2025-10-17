@@ -11,7 +11,7 @@ TERMUX_PKG_BUILD_DEPENDS="aosp-libs"
 TERMUX_PKG_AUTO_UPDATE=true
 # i686 is currently unsupported pending;
 # https://github.com/termux/ghc-cross-tools/pull/6
-TERMUX_PKG_EXCLUDED_ARCHES="i686"
+# TERMUX_PKG_EXCLUDED_ARCHES="i686"
 
 termux_step_pre_configure() {
 	chmod u+x ./striptests
@@ -23,7 +23,7 @@ termux_step_post_configure() {
 	mv splitmix{-*,}
 
 	for f in "$TERMUX_PKG_BUILDER_DIR"/splitmix-patches/*.patch; do
-		patch --silent -p1 -d splitmix < "$f"
+		patch --silent -p1 -d splitmix <"$f"
 	done
 
 	cabal get entropy-0.4.1.11
